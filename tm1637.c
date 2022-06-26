@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2017-2018, Łukasz Marcin Podkalicki <lpodkalicki@gmail.com>
- *
- * This is ATtiny13/25/45/85 library for 4-Digit LED Display based on TM1637 chip.
+ * Copyright (c) 2022, Changed to CodevisonAVR version BY Pouria Amiri 
+ * This is CODEVISIONAVR library for 4-Digit LED Display based on TM1637 chip.
  *
  * Features:
  * - display raw segments
@@ -11,23 +11,22 @@
  * - brightness control
  *
  * References:
- * - library: https://github.com/lpodkalicki/attiny-tm1637-library
- * - documentation: https://github.com/lpodkalicki/attiny-tm1637-library/README.md
- * - TM1637 datasheet: https://github.com/lpodkalicki/attiny-tm1637-library/blob/master/docs/TM1637_V2.4_EN.pdf
+ * - https://github.com/pouria-workshop/tm1637-library
+ * - documentation: https://github.com/pouria-workshop/tm1637-library/README.md
+ * - TM1637 datasheet: https://github.com/pouria-workshop/tm1637-library/blob/master/docs/TM1637_V2.4_EN.pdf
  */
 
-#include <avr/io.h>
-#include <avr/pgmspace.h>
-#include <util/delay.h>
+
+#include <delay.h>
 #include "tm1637.h"
 
-#define	TM1637_DIO_HIGH()		(PORTB |= _BV(TM1637_DIO_PIN))
-#define	TM1637_DIO_LOW()		(PORTB &= ~_BV(TM1637_DIO_PIN))
-#define	TM1637_DIO_OUTPUT()		(DDRB |= _BV(TM1637_DIO_PIN))
-#define	TM1637_DIO_INPUT()		(DDRB &= ~_BV(TM1637_DIO_PIN))
-#define	TM1637_DIO_READ() 		(((PINB & _BV(TM1637_DIO_PIN)) > 0) ? 1 : 0)
-#define	TM1637_CLK_HIGH()		(PORTB |= _BV(TM1637_CLK_PIN))
-#define	TM1637_CLK_LOW()		(PORTB &= ~_BV(TM1637_CLK_PIN))
+#define	TM1637_DIO_HIGH		PORTB |= (1<<TM1637_DIO_PIN)
+#define	TM1637_DIO_LOW		PORTB &= ~(1<<TM1637_DIO_PIN)
+#define	TM1637_DIO_OUTPUT	DDRB |= (1<<TM1637_DIO_PIN)
+#define	TM1637_DIO_INPUT	DDRB &= ~(1<<TM1637_DIO_PIN)
+#define	TM1637_DIO_READ 	PINB & (1<<TM1637_DIO_PIN) > 0 ? 1 : 0
+#define	TM1637_CLK_HIGH		PORTB |= (1<<TM1637_CLK_PIN)
+#define	TM1637_CLK_LOW		PORTB &= ~(1<<TM1637_CLK_PIN)
 
 static void TM1637_send_config(const uint8_t enable, const uint8_t brightness);
 static void TM1637_send_command(const uint8_t value);
@@ -37,7 +36,7 @@ static uint8_t TM1637_write_byte(uint8_t value);
 
 static uint8_t _config = TM1637_SET_DISPLAY_ON | TM1637_BRIGHTNESS_MAX;
 static uint8_t _segments = 0xff;
-PROGMEM const uint8_t _digit2segments[] =
+flash uint8_t _digit2segments[] =
 {
 	0x3F, // 0
 	0x06, // 1
@@ -55,8 +54,8 @@ void
 TM1637_init(const uint8_t enable, const uint8_t brightness)
 {
 
-	DDRB |= (_BV(TM1637_DIO_PIN)|_BV(TM1637_CLK_PIN));
-	PORTB &= ~(_BV(TM1637_DIO_PIN)|_BV(TM1637_CLK_PIN));
+	DDRB |= ((1<<TM1637_DIO_PIN)|(1<<TM1637_CLK_PIN));
+	PORTB &= ~(1<<(TM1637_DIO_PIN)|(1<<TM1637_CLK_PIN));
 	TM1637_send_config(enable, brightness);
 }
 
@@ -89,7 +88,7 @@ TM1637_display_segments(const uint8_t position, const uint8_t segments)
 void
 TM1637_display_digit(const uint8_t position, const uint8_t digit)
 {
-	uint8_t segments = (digit < 10 ? pgm_read_byte_near((uint8_t *)&_digit2segments + digit) : 0x00);
+	uint8_t segments = digit < 10 ? *(_digit2segments + digit) : 0x00;
 
 	if (position == 0x01) {
 		segments = segments | (_segments & 0x80);
@@ -144,26 +143,26 @@ void
 TM1637_start(void)
 {
 
-	TM1637_DIO_HIGH();
-	TM1637_CLK_HIGH();
-	_delay_us(TM1637_DELAY_US);
-	TM1637_DIO_LOW();
+	TM1637_DIO_HIGH;
+	TM1637_CLK_HIGH;
+	delay_us(TM1637_DELAY_US);
+	TM1637_DIO_LOW;
 }
 
 void
 TM1637_stop(void)
 {
 
-	TM1637_CLK_LOW();
-	_delay_us(TM1637_DELAY_US);
+	TM1637_CLK_LOW;
+	delay_us(TM1637_DELAY_US);
 
-	TM1637_DIO_LOW();
-	_delay_us(TM1637_DELAY_US);
+	TM1637_DIO_LOW;
+	delay_us(TM1637_DELAY_US);
 
-	TM1637_CLK_HIGH();
-	_delay_us(TM1637_DELAY_US);
+	TM1637_CLK_HIGH;
+	delay_us(TM1637_DELAY_US);
 
-	TM1637_DIO_HIGH();
+	TM1637_DIO_HIGH;
 }
 
 uint8_t
@@ -172,38 +171,38 @@ TM1637_write_byte(uint8_t value)
 	uint8_t i, ack;
 
 	for (i = 0; i < 8; ++i, value >>= 1) {
-		TM1637_CLK_LOW();
-		_delay_us(TM1637_DELAY_US);
+		TM1637_CLK_LOW;
+		delay_us(TM1637_DELAY_US);
 
 		if (value & 0x01) {
-			TM1637_DIO_HIGH();
+			TM1637_DIO_HIGH;
 		} else {
-			TM1637_DIO_LOW();
+			TM1637_DIO_LOW;
 		}
 
-		TM1637_CLK_HIGH();
-		_delay_us(TM1637_DELAY_US);
+		TM1637_CLK_HIGH;
+		delay_us(TM1637_DELAY_US);
 	}
 
-	TM1637_CLK_LOW();
-	TM1637_DIO_INPUT();
-	TM1637_DIO_HIGH();
-	_delay_us(TM1637_DELAY_US);
+	TM1637_CLK_LOW;
+	TM1637_DIO_INPUT;
+	TM1637_DIO_HIGH;
+	delay_us(TM1637_DELAY_US);
 
-	ack = TM1637_DIO_READ();
+	ack = TM1637_DIO_READ;
 	if (ack) {
-		TM1637_DIO_OUTPUT();
-		TM1637_DIO_LOW();
+		TM1637_DIO_OUTPUT;
+		TM1637_DIO_LOW;
 	}
-	_delay_us(TM1637_DELAY_US);
+	delay_us(TM1637_DELAY_US);
 
-	TM1637_CLK_HIGH();
-	_delay_us(TM1637_DELAY_US);
+	TM1637_CLK_HIGH;
+	delay_us(TM1637_DELAY_US);
 
-	TM1637_CLK_LOW();
-	_delay_us(TM1637_DELAY_US);
+	TM1637_CLK_LOW;
+	delay_us(TM1637_DELAY_US);
 
-	TM1637_DIO_OUTPUT();
+	TM1637_DIO_OUTPUT;
 
 	return ack;
 }
