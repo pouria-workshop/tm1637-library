@@ -1,18 +1,21 @@
 /**
  * Copyright (c) 2017-2018, Łukasz Marcin Podkalicki <lpodkalicki@gmail.com>
+ * Copyright (c) 2022, Changed to CodevisonAVR version BY Pouria Amiri
  *
- * This is ATtiny13 "Running Digits" example using attiny-tm1637-library,
- * https://github.com/lpodkalicki/attiny-tm1637-library .
+ * This is AVR "Running Digits" example using tm1637-library,
+ * https://github.com/pouria-workshop/tm1637-library .
  *
  */
 
-#include <stdint.h>
-#include <avr/io.h>
-#include <util/delay.h>
+#include <mega2560.h>
 #include "tm1637.h"
+#include <stdint.h>
+#include <delay.h>
+#include <i2c.h>
 
-int
-main(void)
+// Declare your global variables here
+
+void main(void)
 {
 	uint8_t n, k = 0;
 
@@ -25,9 +28,9 @@ main(void)
 			TM1637_display_digit(n, (k + n) % 0x10);
 		}
 		TM1637_display_colon(1);
-		_delay_ms(200);
+		delay_ms(200);
 		TM1637_display_colon(0);
-		_delay_ms(200);
+		delay_ms(200);
 		k++;
 	}
 }
