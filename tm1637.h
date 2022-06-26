@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2017-2018, Łukasz Marcin Podkalicki <lpodkalicki@gmail.com>
- *
- * This is ATtiny13/25/45/85 library for 4-Digit LED Display based on TM1637 chip.
+ * Copyright (c) 2022, Changed to CodevisonAVR version BY Pouria Amiri 
+ * This is CODEVISIONAVR library for 4-Digit LED Display based on TM1637 chip.
  *
  * Features:
  * - display raw segments
@@ -11,19 +11,19 @@
  * - brightness control
  *
  * References:
- * - library: https://github.com/lpodkalicki/attiny-tm1637-library
- * - documentation: https://github.com/lpodkalicki/attiny-tm1637-library/README.md
- * - TM1637 datasheet: https://github.com/lpodkalicki/attiny-tm1637-library/blob/master/docs/TM1637_V2.4_EN.pdf
+ * - https://github.com/pouria-workshop/tm1637-library
+ * - documentation: https://github.com/pouria-workshop/tm1637-library/README.md
+ * - TM1637 datasheet: https://github.com/pouria-workshop/tm1637-library/blob/master/docs/TM1637_V2.4_EN.pdf
  */
 
-#ifndef	_ATTINY_TM1637_H_
-#define	_ATTINY_TM1637_H_
+#ifndef	_TM1637_H_
+#define	_TM1637_H_
 
 #include <stdint.h>
 
 // Main Settings
-#define	TM1637_DIO_PIN			PB0
-#define	TM1637_CLK_PIN			PB1
+#define	TM1637_DIO_PIN			0
+#define	TM1637_CLK_PIN			1
 #define	TM1637_DELAY_US			(5)
 #define	TM1637_BRIGHTNESS_MAX		(7)
 #define	TM1637_POSITION_MAX		(4)
@@ -103,4 +103,4 @@ void TM1637_display_colon(const uint8_t value);
  */
 void TM1637_clear(void);
 
-#endif	/* !_ATTINY_TM1637_H_ */
+#endif	/* !_TM1637_H_ */
