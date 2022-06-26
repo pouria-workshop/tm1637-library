@@ -1,5 +1,5 @@
 # TM1637 Library
-This is tinyAVR (ATtiny13, ATtiny25, ATtiny45, ATtiny85) library for 7-segment display modules based on TM1637 chip. The TM1637 chip also has keyboard input capability, but it's not implemented in this library.
+This is AVR & tinyAVR for CodeVisionAVR Compiler (ATtiny13, ATtiny25, ATtiny45, ATtiny85) library for 7-segment display modules based on TM1637 chip. The TM1637 chip also has keyboard input capability, but it's not implemented in this library.
 
 ![alt text](docs/TM1637.jpg "TM1637 Controller Module")
 
@@ -18,10 +18,11 @@ This lightweight library has the following features:
 This example code demonstrates basic usage of the library:
 
 ```c
-#include <stdint.h>
-#include <avr/io.h>
-#include <util/delay.h>
+#include <mega2560.h>
 #include "tm1637.h"
+#include <stdint.h>
+#include <delay.h>
+#include <i2c.h>
 
 int
 main(void)
@@ -37,9 +38,9 @@ main(void)
 			TM1637_display_digit(n, (k + n) % 0x10);
 		}
 		TM1637_display_colon(1);
-		_delay_ms(200);
+		delay_ms(200);
 		TM1637_display_colon(0);
-		_delay_ms(200);
+		delay_ms(200);
 		k++;
 	}
 }
